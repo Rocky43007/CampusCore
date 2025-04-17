@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "my-expo-app",
-    "slug": "my-expo-app",
+    "name": "CampusCore",
+    "slug": "campuscore",
     "version": "1.0.0",
+    "newArchEnabled": true,
 
     "web": {
       "favicon": "./assets/favicon.png"
