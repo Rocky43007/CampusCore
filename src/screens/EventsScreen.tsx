@@ -209,9 +209,7 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
       )}
       <SafeAreaView className="flex-1 bg-slate-50">
         {/* Status Bar */}
-        {Platform.OS === 'android' && (
-          <StatusBar barStyle="light-content" backgroundColor="#900000" animated />
-        )}
+        <StatusBar barStyle="light-content" backgroundColor="#900000" animated />
 
         {/* Main Content */}
         <View
