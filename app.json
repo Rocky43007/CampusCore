@@ -4,28 +4,24 @@
     "slug": "campuscore",
     "version": "1.0.0",
     "newArchEnabled": true,
-
     "web": {
       "favicon": "./src/assets/favicon.png"
     },
-
     "experiments": {
       "tsconfigPaths": true
     },
-
     "plugins": [],
-
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
-
     "userInterfaceStyle": "light",
-
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -33,6 +29,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.rocky43007.campuscore"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a9ff2ab5-bb25-427e-95bb-a54f466f0db4"
       }
     }
   }
