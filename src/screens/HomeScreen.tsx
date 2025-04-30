@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppHeader from '~/components/AppHeader';
 import DefaultModal from '~/components/DefaultModal';
 import EmergencyCard from '~/components/EmergencyCard';
+import AppFooter from '~/components/Footer';
 import PreviewModal from '~/components/PreviewModal';
 import QuickLinkItem from '~/components/QuickLinkItem';
 import SectionTitle from '~/components/SectionTitle';
@@ -101,7 +102,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
       color: COLORS.primary,
       link: () => openAppLink(APP_LINKS.printing),
     },
-    { icon: 'person-outline', title: 'Profile', color: COLORS.primary },
+    {
+      icon: 'person-outline',
+      title: 'Profile',
+      color: COLORS.primary,
+      link: () => navigation.navigate('Profile'),
+    },
   ];
 
   const quickLinks: QuickLink[] = [
@@ -422,6 +428,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
             </View>
           </DefaultModal>
         </View>
+        <AppFooter />
       </SafeAreaView>
     </>
   );

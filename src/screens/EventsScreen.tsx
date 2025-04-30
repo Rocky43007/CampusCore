@@ -19,6 +19,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppHeader from '~/components/AppHeader';
+import AppFooter from '~/components/Footer';
 import { COLORS } from '~/constants/colors';
 import { CampusEvent } from '~/types';
 
@@ -281,6 +282,7 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
             />
           )}
         </View>
+        <AppFooter />
       </SafeAreaView>
     </>
   );
