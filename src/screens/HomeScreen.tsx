@@ -38,7 +38,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
   const [isPdfPreview, setIsPdfPreview] = useState<boolean>(false);
   const [isTransportModalVisible, setIsTransportModalVisible] = useState<boolean>(false);
+  const [isDiningModalVisible, setIsDiningModalVisible] = useState<boolean>(false);
   const [isNotificationsModalVisible, setIsNotificationsModalVisible] = useState<boolean>(false);
+  const [isAlertVisible, setIsAlertVisible] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -51,15 +53,30 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
   }, []);
 
   const serviceTiles: IServiceTile[] = [
-    { icon: 'calendar-outline', title: 'Schedule', color: COLORS.secondary },
-    { icon: 'book-outline', title: 'Courses', color: COLORS.secondary },
+    {
+      icon: 'calendar-outline',
+      title: 'Schedule',
+      color: COLORS.secondary,
+      link: () => setIsAlertVisible(true),
+    },
+    {
+      icon: 'book-outline',
+      title: 'Courses',
+      color: COLORS.secondary,
+      link: () => setIsAlertVisible(true),
+    },
     {
       icon: 'people-outline',
       title: 'Community',
       color: COLORS.secondary,
       link: () => navigation.navigate('Events'),
     },
-    { icon: 'library-outline', title: 'Resources', color: COLORS.tertiary },
+    {
+      icon: 'library-outline',
+      title: 'Resources',
+      color: COLORS.tertiary,
+      link: () => setIsAlertVisible(true),
+    },
     {
       icon: 'barbell-outline',
       title: 'Fitness',
@@ -72,14 +89,19 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
       color: COLORS.tertiary,
       link: () => setIsTransportModalVisible(true),
     },
-    { icon: 'fast-food-outline', title: 'Dining', color: COLORS.primary },
+    {
+      icon: 'fast-food-outline',
+      title: 'Dining',
+      color: COLORS.primary,
+      link: () => setIsDiningModalVisible(true),
+    },
     {
       icon: 'print-sharp',
       title: 'Printing',
       color: COLORS.primary,
       link: () => openAppLink(APP_LINKS.printing),
     },
-    { icon: 'settings-outline', title: 'Settings', color: COLORS.primary },
+    { icon: 'person-outline', title: 'Profile', color: COLORS.primary },
   ];
 
   const quickLinks: QuickLink[] = [
@@ -165,6 +187,13 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
       <SafeAreaView className="flex-1 bg-slate-50">
         {/* Status Bar */}
         <StatusBar barStyle="light-content" backgroundColor="#900000" animated />
+        {/* <StatusBar
+          barStyle="light-content"
+          backgroundColor="#01543f"
+          translucent
+          animated
+          // hidden={false}
+        /> */}
 
         {/* Main Content with adjusted padding for status bar */}
         <View
@@ -190,6 +219,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
               title="Welcome, Seawolf!"
               message="Your campus resources in one place. What would you like to access today?"
             />
+            {/* <WelcomeCard
+              title="Welcome, Bearcat!"
+              message="Your campus resources in one place. What would you like to access today?"
+            /> */}
 
             {/* Campus Services Grid */}
             <SectionTitle title="Campus Services" />
@@ -269,6 +302,37 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
               </View>
             </View>
           </DefaultModal>
+          <DefaultModal
+            isVisible={isDiningModalVisible}
+            onClose={() => setIsDiningModalVisible(false)}
+            title="Dining Applications">
+            <View style={{ padding: 20 }}>
+              <Text
+                style={{ fontSize: 16, color: COLORS.dark, marginBottom: 16, textAlign: 'center' }}>
+                Choose the following dining application
+              </Text>
+
+              <TransportOption
+                title="Nutislice"
+                description="View menus, nutrition information & order food for pickup"
+                icon="fast-food-outline"
+                color={COLORS.secondary}
+                onPress={() => {
+                  openAppLink(APP_LINKS.dining.nutrislice);
+                }}
+              />
+
+              <TransportOption
+                title="GET mobile"
+                description="Track your meal plan balance & transactions"
+                icon="receipt-outline"
+                color={COLORS.tertiary}
+                onPress={() => {
+                  openAppLink(APP_LINKS.dining.get);
+                }}
+              />
+            </View>
+          </DefaultModal>
 
           <PreviewModal
             isVisible={isPreviewVisible}
@@ -314,6 +378,46 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
                   marginBottom: 8,
                 }}>
                 We'll notify you when there's something new
+              </Text>
+            </View>
+          </DefaultModal>
+
+          <DefaultModal
+            isVisible={isAlertVisible}
+            onClose={() => setIsAlertVisible(false)}
+            title="Feature Unavailable">
+            <View
+              style={{
+                padding: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <View
+                style={{
+                  backgroundColor: COLORS.light,
+                  borderRadius: 50,
+                  padding: 16,
+                  marginBottom: 12,
+                }}>
+                <Ionicons name="warning-outline" size={32} color={COLORS.tertiary} />
+              </View>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: COLORS.dark,
+                  marginBottom: 4,
+                }}>
+                This feature is not available yet
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: COLORS.tertiary,
+                  textAlign: 'center',
+                  marginBottom: 8,
+                }}>
+                We're working hard to bring you this feature. Stay tuned for updates!
               </Text>
             </View>
           </DefaultModal>

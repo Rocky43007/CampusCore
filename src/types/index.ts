@@ -30,6 +30,10 @@ export interface AppLinks {
   transport: {
     bus: AppLink;
     bike: AppLink;
+  },
+  dining: {
+    get: AppLink;
+    nutrislice: AppLink;
   };
 }
 

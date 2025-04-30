@@ -34,4 +34,22 @@ export const APP_LINKS: AppLinks = {
       },
     },
   },
+  dining: {
+    get: {
+      ios: 'itms-apps://itunes.apple.com/us/app/get-mobile/id844091049',
+      android: 'market://details?id=com.cbord.get',
+      web: {
+        ios: 'https://apps.apple.com/us/app/get-mobile/id844091049',
+        android: 'https://play.google.com/store/apps/details?id=com.cbord.get',
+      },
+    },
+    nutrislice: {
+      ios: 'itms-apps://itunes.apple.com/us/app/nutrislice/id567183091',
+      android: 'market://details?id=com.nutrislice.schoollunch',
+      web: {
+        ios: 'https://apps.apple.com/us/app/nutrislice/id567183091',
+        android: 'https://play.google.com/store/apps/details?id=com.nutrislice.schoollunch',
+      },
+    },
+  },
 };

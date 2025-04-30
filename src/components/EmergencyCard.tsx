@@ -16,6 +16,7 @@ const EmergencyCard: React.FC<EmergencyCardProps> = ({ onPress }) => (
       source={{
         uri: 'https://stonybrook.edu/commcms/_images/section-backgrounds/red-rays/red-rays-cropped-1.png',
       }}
+      // className="overflow-hidden bg-[#005A43]/50 bg-blend-multiply"
       className="overflow-hidden"
       imageStyle={{ opacity: 0.85 }}>
       <View className="overflow-hidden bg-black/30 bg-blend-multiply">
