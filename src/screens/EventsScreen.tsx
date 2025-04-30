@@ -8,28 +8,32 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  ScrollView,
   Image,
   ActivityIndicator,
   RefreshControl,
   Linking,
   Platform,
   FlatList,
+  TextInput,
+  StyleSheet,
+  ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AppHeader from '~/components/AppHeader';
-import AppFooter from '~/components/Footer';
+// import DevEventCounter from '~/components/DevEventCounter';
 import { COLORS } from '~/constants/colors';
 import { CampusEvent } from '~/types';
-
 import '../../global.css';
 
 // =======================================
-// Navigation Type
+//  Navigation Type
 // =======================================
 type EventsScreenProps = NativeStackScreenProps<RootStackParamList, 'Events'>;
 
+// =======================================
+// EventCard Component
+// =======================================
 const EventCard = React.memo(({ item }: { item: CampusEvent }) => {
   const imageUrl = item.imagePath
     ? `https://se-images.campuslabs.com/clink/images/${item.imagePath}`
@@ -37,11 +41,11 @@ const EventCard = React.memo(({ item }: { item: CampusEvent }) => {
 
   const handlePress = useCallback(() => {
     Linking.openURL(`https://stonybrook.campuslabs.com/engage/event/${item.id}`).catch((err) =>
-      console.error('Failed to open event link:', err)
+      console.error('Link Error', err)
     );
-  }, [item.id]); // Dependency: item.id
+  }, [item.id]);
 
-  const formatEventDate = (startDate: string, endDate: string): string => {
+  const formatEventDate = useCallback((startDate: string, endDate: string): string => {
     try {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -60,61 +64,62 @@ const EventCard = React.memo(({ item }: { item: CampusEvent }) => {
       }
       return `${startStr} - ${end.toLocaleString('en-US', options)}`;
     } catch (e) {
-      console.error('Error formatting date:', e);
       return 'Date unavailable';
     }
-  };
+  }, []);
 
   return (
-    <TouchableOpacity
-      className="mb-4 overflow-hidden rounded-xl bg-white shadow-sm"
-      activeOpacity={0.7}
-      onPress={handlePress}>
-      {imageUrl ? (
-        <Image source={{ uri: imageUrl }} className="h-48 w-full bg-gray-200" resizeMode="cover" />
-      ) : (
-        <View className="h-48 w-full items-center justify-center bg-gray-100">
-          <Ionicons name="calendar-outline" size={40} color={COLORS.tertiary} />
-        </View>
-      )}
-      <View className="p-4">
-        <Text className="mb-1 text-lg font-semibold" style={{ color: COLORS.secondary }}>
+    <TouchableOpacity style={styles.cardContainer} activeOpacity={0.8} onPress={handlePress}>
+      {/* Image Container */}
+      <View style={styles.cardImageContainer}>
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={styles.cardImage} resizeMode="cover" />
+        ) : (
+          <View style={[styles.cardImage, styles.cardImagePlaceholder]}>
+            <Ionicons name="calendar-outline" size={40} color={COLORS.tertiary} />
+          </View>
+        )}
+      </View>
+      {/* Content Container */}
+      <View style={styles.cardContent}>
+        <Text style={styles.cardTitle} numberOfLines={2}>
           {item.name || 'Event Name Unavailable'}
         </Text>
-
-        <View className="mb-2 flex-row items-center">
-          <Ionicons name="time-outline" size={16} color={COLORS.tertiary} className="mr-1.5" />
-          <Text className="text-sm text-gray-600">
-            {formatEventDate(item.startsOn, item.endsOn)}
-          </Text>
+        {/* Info Rows */}
+        <View style={styles.infoRow}>
+          <Ionicons name="time-outline" size={15} color={COLORS.tertiary} style={styles.infoIcon} />
+          <Text style={styles.infoText}>{formatEventDate(item.startsOn, item.endsOn)}</Text>
         </View>
-
-        <View className="mb-2 flex-row items-center">
-          <Ionicons name="location-outline" size={16} color={COLORS.tertiary} className="mr-1.5" />
-          <Text className="flex-1 text-sm text-gray-600" numberOfLines={1}>
+        <View style={styles.infoRow}>
+          <Ionicons
+            name="location-outline"
+            size={15}
+            color={COLORS.tertiary}
+            style={styles.infoIcon}
+          />
+          <Text style={styles.infoText} numberOfLines={1}>
             {item.location?.isVirtual ? 'Virtual Event' : item.location?.name || 'Location TBD'}
           </Text>
         </View>
-
         {item.organization?.name && (
-          <View className="mb-2 flex-row items-center">
-            <Ionicons name="people-outline" size={16} color={COLORS.tertiary} className="mr-1.5" />
-            <Text className="flex-1 text-sm text-gray-600" numberOfLines={1}>
+          <View style={styles.infoRow}>
+            <Ionicons
+              name="people-outline"
+              size={15}
+              color={COLORS.tertiary}
+              style={styles.infoIcon}
+            />
+            <Text style={styles.infoText} numberOfLines={1}>
               {item.organization.name}
             </Text>
           </View>
         )}
-
+        {/* Categories */}
         {item.categories && item.categories.length > 0 && (
-          <View className="mt-1 flex-row flex-wrap">
+          <View style={styles.categoryRow}>
             {item.categories.slice(0, 3).map((category) => (
-              <View
-                key={category.id}
-                className="mb-1 mr-1.5 rounded-full px-2 py-0.5"
-                style={{ backgroundColor: `${COLORS.secondary}1A` }}>
-                <Text className="text-xs font-medium" style={{ color: COLORS.secondary }}>
-                  {category.name}
-                </Text>
+              <View key={category.id} style={styles.categoryTag}>
+                <Text style={styles.categoryText}>{category.name}</Text>
               </View>
             ))}
           </View>
@@ -129,80 +134,166 @@ const EventCard = React.memo(({ item }: { item: CampusEvent }) => {
 // =======================================
 export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Element {
   const insets = useSafeAreaInsets();
-
-  const [events, setEvents] = useState<CampusEvent[]>([]);
+  // State
+  const [fullEvents, setFullEvents] = useState<CampusEvent[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<CampusEvent[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false); // For pagination loading
 
-  const fetchEvents = useCallback(async () => {
-    // Only set loading true initially, not for refresh
-    if (!refreshing) {
-      setLoading(true);
-    }
-    setError(null);
+  // Constants
+  const TAKE = 100; // Events per fetch
 
-    try {
-      const now = new Date().toISOString();
-      const response = await fetch(
-        `https://stonybrook.campuslabs.com/engage/api/discovery/event/search?endsAfter=${now}&orderByField=startsOn&orderByDirection=ascending&status=Approved&take=50`
-      );
+  // Fetching Logic (with pagination)
+  const fetchEvents = useCallback(
+    async (isRefreshing = false) => {
+      if (!isRefreshing) setLoading(true);
+      setIsLoadingMore(true);
+      setError(null);
+      if (isRefreshing) setSearchQuery(''); // Clear search only on manual refresh
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch events (${response.status})`);
+      let allFetchedEvents: CampusEvent[] = isRefreshing ? [] : fullEvents; // Start from scratch on refresh
+      let skip = isRefreshing ? 0 : allFetchedEvents.length; // Determine starting point
+      let hasMore = true;
+
+      try {
+        while (hasMore) {
+          const now = new Date().toISOString();
+          const apiUrl = `https://stonybrook.campuslabs.com/engage/api/discovery/event/search?endsAfter=${now}&orderByField=startsOn&orderByDirection=ascending&status=Approved&take=${TAKE}&skip=${skip}`;
+          const response = await fetch(apiUrl);
+
+          if (!response.ok)
+            throw new Error(`Fetch failed (skip=${skip}, status=${response.status})`);
+
+          const data = await response.json();
+          const newEvents = data.value || [];
+
+          if (newEvents.length > 0) {
+            const currentEventIds = new Set(allFetchedEvents.map((e) => e.id));
+            const uniqueNewEvents = newEvents.filter(
+              (event: CampusEvent) => !currentEventIds.has(event.id)
+            );
+            allFetchedEvents = allFetchedEvents.concat(uniqueNewEvents);
+          }
+
+          if (newEvents.length < TAKE) {
+            hasMore = false;
+          } else {
+            skip += TAKE;
+          }
+        }
+        setFullEvents(allFetchedEvents);
+        // Apply current search filter immediately after fetching all data
+        if (searchQuery) {
+          const lowerCaseQuery = searchQuery.toLowerCase();
+          const filtered = allFetchedEvents.filter(
+            (event) =>
+              event.name?.toLowerCase().includes(lowerCaseQuery) ||
+              event.location?.name?.toLowerCase().includes(lowerCaseQuery) ||
+              event.organization?.name?.toLowerCase().includes(lowerCaseQuery) ||
+              event.categories?.some((cat) => cat.name?.toLowerCase().includes(lowerCaseQuery))
+          );
+          setFilteredEvents(filtered);
+        } else {
+          setFilteredEvents(allFetchedEvents);
+        }
+      } catch (err: any) {
+        setError(`Unable to load events. ${err.message || 'Check connection.'}`);
+        console.error('Fetch error:', err);
+        if (isRefreshing) {
+          setFullEvents([]);
+          setFilteredEvents([]);
+        } // Clear only if refresh fails completely
+      } finally {
+        setLoading(false);
+        setIsLoadingMore(false);
+        setRefreshing(false);
       }
-
-      const data = await response.json();
-      setEvents(data.value || []); // Set events on success
-    } catch (err: any) {
-      setError('Unable to load events. Please check connection and try again.');
-      console.error('Error fetching events:', err.message || err);
-      setEvents([]); // Clear events on error to avoid showing stale data
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [refreshing]);
+    },
+    [searchQuery, fullEvents]
+  ); // Include searchQuery and fullEvents if logic depends on them for pagination start
 
   useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
+    fetchEvents(false); // Initial fetch
+  }, []); // Run only once on mount
 
+  // Filtering Logic - Separated from fetching, uses useMemo for efficiency
+  const debouncedFilter = useCallback((query: string, eventsList: CampusEvent[]) => {
+    if (!query) return eventsList;
+    const lowerCaseQuery = query.toLowerCase();
+    return eventsList.filter(
+      (event) =>
+        event.name?.toLowerCase().includes(lowerCaseQuery) ||
+        event.location?.name?.toLowerCase().includes(lowerCaseQuery) ||
+        event.organization?.name?.toLowerCase().includes(lowerCaseQuery) ||
+        event.categories?.some((cat) => cat.name?.toLowerCase().includes(lowerCaseQuery))
+    );
+  }, []);
+
+  useEffect(() => {
+    // Debounce the state update for filteredEvents
+    const timerId = setTimeout(() => {
+      setFilteredEvents(debouncedFilter(searchQuery, fullEvents));
+    }, 200); // Adjust debounce time as needed
+
+    return () => clearTimeout(timerId);
+  }, [searchQuery, fullEvents, debouncedFilter]);
+
+  // Refresh Handler
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchEvents();
+    fetchEvents(true); // Trigger a full refresh
   }, [fetchEvents]);
 
+  // --- Memoized FlatList Props ---
   const keyExtractor = useCallback((item: CampusEvent) => item.id.toString(), []);
-
-  // Use useCallback for stability, rendering the memoized EventCard
   const renderItem = useCallback(
     ({ item }: { item: CampusEvent }) => <EventCard item={item} />,
     []
   );
 
+  // --- Dynamic Empty List Component ---
   const ListEmptyComponent = useCallback(
     () => (
-      <View className="mx-4 mt-10 flex-1 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
-        <Ionicons name="calendar-outline" size={48} color={COLORS.secondary} />
-        <Text
-          className="mt-3 text-center text-lg font-semibold"
-          style={{ color: COLORS.secondary }}>
-          No upcoming events found
+      <View style={styles.emptyContainer}>
+        <Ionicons
+          name={searchQuery ? 'search-outline' : 'calendar-outline'}
+          size={50}
+          color={COLORS.tertiary}
+        />
+        <Text style={styles.emptyTitle}>
+          {searchQuery ? `No results for "${searchQuery}"` : 'No upcoming events'}
         </Text>
-        <Text className="mt-1 text-center text-sm text-gray-600">
-          Check back later or pull down to refresh.
+        <Text style={styles.emptySubtitle}>
+          {searchQuery
+            ? 'Try a different search term.'
+            : 'Check back later or pull down to refresh.'}
         </Text>
       </View>
     ),
-    []
+    [searchQuery]
   );
 
-  // --- Notification Press Handler ---
+  // --- Footer Loading Indicator ---
+  const ListFooterComponent = useCallback(
+    () =>
+      isLoadingMore && !loading ? (
+        <View style={styles.footerLoadingContainer}>
+          <ActivityIndicator size="small" color={COLORS.primary} />
+          <Text style={styles.footerLoadingText}>Loading more...</Text>
+        </View>
+      ) : null,
+    [isLoadingMore, loading]
+  );
+
+  // --- Notification Handler ---
   const handleNotificationPress = (): void => {
-    console.log('Notification icon pressed on Events Screen');
+    console.log('Notifications');
   };
 
+  // --- Main Render ---
   return (
     <>
       {Platform.OS === 'ios' && (
@@ -212,7 +303,6 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
         {/* Status Bar */}
         <StatusBar barStyle="light-content" backgroundColor="#900000" animated />
 
-        {/* Main Content */}
         <View
           style={{
             flex: 1,
@@ -225,65 +315,228 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
             onNotificationPress={handleNotificationPress}
             showBackButton
             navigation={navigation}
+            style={{ backgroundColor: COLORS.primary }}
           />
 
-          {/* Main Content ScrollView with consistent padding */}
-          {loading && !refreshing ? (
-            <View className="flex-1 items-center justify-center py-16">
+          {/* Search Bar Container */}
+          <View style={styles.searchOuterContainer}>
+            <View style={styles.searchInnerContainer}>
+              <Ionicons
+                name="search-outline"
+                size={22}
+                color={COLORS.tertiary}
+                style={styles.searchIcon}
+              />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search events..."
+                placeholderTextColor={COLORS.tertiary}
+                value={searchQuery}
+                onChangeText={setSearchQuery} // Directly sets state, useEffect handles filtering
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="search"
+                clearButtonMode="while-editing"
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+                  <Ionicons name="close-circle" size={22} color={COLORS.tertiary} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          {/* Main Content Area */}
+          {loading ? (
+            <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.primary} />
-              <Text className="mt-3 text-gray-500">Loading events...</Text>
+              <Text style={styles.loadingText}>Loading Events...</Text>
             </View>
           ) : error ? (
-            <ScrollView // Use ScrollView here in case error message + button is long
-              contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+            <ScrollView // Use ScrollView for error state to allow refresh
+              contentContainerStyle={styles.errorContainer}
               refreshControl={
-                // Allow refresh even on error screen
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={onRefresh}
                   tintColor={COLORS.primary}
-                  colors={[COLORS.primary, COLORS.secondary]}
+                  colors={[COLORS.primary]}
                 />
               }>
-              <View className="mx-4 items-center justify-center rounded-xl border border-red-200 bg-red-50 p-6 shadow-sm">
-                <Ionicons name="cloud-offline-outline" size={48} color={COLORS.primary} />
-                <Text className="mt-3 text-center font-semibold text-red-700">Loading Failed</Text>
-                <Text className="mt-1 text-center text-sm text-red-600">{error}</Text>
+              <View style={styles.errorContent}>
+                <Ionicons name="cloud-offline-outline" size={50} color={COLORS.primary} />
+                <Text style={styles.errorTitle}>Loading Failed</Text>
+                <Text style={styles.errorSubtitle}>{error}</Text>
                 <TouchableOpacity
-                  className="mt-5 rounded-lg px-5 py-2"
-                  style={{ backgroundColor: COLORS.primary }}
-                  onPress={fetchEvents} // Use memoized fetchEvents
+                  style={[styles.retryButton, { backgroundColor: COLORS.primary }]}
+                  onPress={() => fetchEvents(true)}
                   activeOpacity={0.7}>
-                  <Text className="font-semibold text-white">Try Again</Text>
+                  <Text style={styles.retryButtonText}>Try Again</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
           ) : (
-            // Use FlatList for the event items
             <FlatList
-              data={events}
+              data={filteredEvents}
               renderItem={renderItem}
               keyExtractor={keyExtractor}
               ListEmptyComponent={ListEmptyComponent}
-              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20, paddingTop: 16 }} // pt-4 moved here
+              ListFooterComponent={ListFooterComponent}
+              contentContainerStyle={styles.listContentContainer}
+              keyboardDismissMode="on-drag"
+              keyboardShouldPersistTaps="handled"
               refreshControl={
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={onRefresh}
                   tintColor={COLORS.primary}
-                  colors={[COLORS.primary, COLORS.secondary]}
+                  colors={[COLORS.primary]}
                 />
               }
-              // Performance Optimization Props
-              initialNumToRender={10}
+              initialNumToRender={8}
               maxToRenderPerBatch={5}
               windowSize={11}
               removeClippedSubviews={Platform.OS === 'android'}
+              style={styles.listStyle}
             />
           )}
         </View>
-        <AppFooter />
+        {/* {!loading && (
+          <DevEventCounter filteredCount={filteredEvents.length} totalCount={fullEvents.length} />
+        )} */}
       </SafeAreaView>
     </>
   );
 }
+
+// =======================================
+// StyleSheet (Refined Styles)
+// =======================================
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#F9FAFB' /* bg-slate-100 */ },
+  // Search Bar
+  searchOuterContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 12,
+    backgroundColor: '#F9FAFB', // Match screen background
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB', // border-gray-200
+  },
+  searchInnerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF', // bg-white
+    borderRadius: 10, // Slightly more rounded
+    paddingHorizontal: 12,
+    height: 44, // Consistent height
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05, // Subtle shadow
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  searchIcon: { marginRight: 8 },
+  searchInput: {
+    flex: 1,
+    fontSize: 16, // Slightly larger text
+    color: COLORS.dark,
+    paddingVertical: 0, // Remove default padding if any
+  },
+  clearButton: { paddingLeft: 8 },
+  // List
+  listStyle: { flex: 1 },
+  listContentContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 16, // Space below search bar
+    paddingBottom: 30,
+  },
+  // Card
+  cardContainer: {
+    backgroundColor: '#FFFFFF', // bg-white
+    borderRadius: 12, // rounded-xl
+    marginBottom: 16, // mb-4
+    shadowColor: '#4B5563', // gray-600 shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, // Softer shadow
+    shadowRadius: 5,
+    elevation: 3,
+    overflow: 'hidden', // Ensure image corners are clipped
+  },
+  cardImageContainer: {},
+  cardImage: { height: 180, width: '100%' }, // h-45 approx
+  cardImagePlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6' /* bg-gray-100 */,
+  },
+  cardContent: { padding: 16 }, // p-4
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    /* semibold */ color: COLORS.secondary,
+    marginBottom: 6,
+  },
+  infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
+  infoIcon: { marginRight: 8 }, // Increase spacing
+  infoText: { flex: 1, fontSize: 14, color: '#4B5563' /* text-gray-600 */ },
+  categoryRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderColor: '#F3F4F6' /* border-gray-100 */,
+  },
+  categoryTag: {
+    backgroundColor: '#E5E7EB',
+    /* bg-gray-200 */ borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  categoryText: { fontSize: 11, color: '#4B5563', /* text-gray-600 */ fontWeight: '500' },
+  // States
+  loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 },
+  loadingText: { marginTop: 12, color: '#64748B', fontSize: 15 },
+  errorContainer: { flexGrow: 1, justifyContent: 'center', padding: 16 },
+  errorContent: {
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 30,
+    marginHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  errorTitle: { marginTop: 15, fontSize: 18, fontWeight: '600', color: COLORS.primary },
+  errorSubtitle: { marginTop: 6, fontSize: 14, color: '#DC2626', textAlign: 'center' },
+  retryButton: { marginTop: 25, paddingHorizontal: 25, paddingVertical: 12, borderRadius: 8 },
+  retryButtonText: { fontWeight: '600', color: '#FFF', fontSize: 15 },
+  emptyContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    marginTop: 40,
+  },
+  emptyTitle: {
+    marginTop: 15,
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.secondary,
+    textAlign: 'center',
+  },
+  emptySubtitle: { marginTop: 6, fontSize: 14, color: '#475569', textAlign: 'center' },
+  footerLoadingContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  footerLoadingText: { marginLeft: 10, color: COLORS.tertiary, fontSize: 14 },
+});

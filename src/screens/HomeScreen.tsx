@@ -11,7 +11,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppHeader from '~/components/AppHeader';
 import DefaultModal from '~/components/DefaultModal';
 import EmergencyCard from '~/components/EmergencyCard';
-import AppFooter from '~/components/Footer';
 import PreviewModal from '~/components/PreviewModal';
 import QuickLinkItem from '~/components/QuickLinkItem';
 import SectionTitle from '~/components/SectionTitle';
@@ -428,7 +427,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
             </View>
           </DefaultModal>
         </View>
-        <AppFooter />
       </SafeAreaView>
     </>
   );
