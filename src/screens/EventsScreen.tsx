@@ -64,6 +64,7 @@ const EventCard = React.memo(({ item }: { item: CampusEvent }) => {
       }
       return `${startStr} - ${end.toLocaleString('en-US', options)}`;
     } catch (e) {
+      console.error('Date formatting error:', e);
       return 'Date unavailable';
     }
   }, []);

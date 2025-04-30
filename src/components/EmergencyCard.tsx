@@ -6,7 +6,6 @@ interface EmergencyCardProps {
   onPress: () => void;
 }
 
-
 const EmergencyCard: React.FC<EmergencyCardProps> = ({ onPress }) => (
   <TouchableOpacity
     className="mb-6 overflow-hidden rounded-2xl shadow-md"
