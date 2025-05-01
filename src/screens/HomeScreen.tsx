@@ -3,7 +3,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'App';
 import { BlurView } from 'expo-blur';
 import * as NavigationBar from 'expo-navigation-bar';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { View, Text, SafeAreaView, StatusBar, ScrollView, Linking, Platform } from 'react-native';
 import '../../global.css';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
