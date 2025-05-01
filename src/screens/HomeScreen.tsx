@@ -318,7 +318,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
               </Text>
 
               <TransportOption
-                title="Nutislice"
+                title="Nutrislice"
                 description="View menus, nutrition information & order food for pickup"
                 icon="fast-food-outline"
                 color={COLORS.secondary}
