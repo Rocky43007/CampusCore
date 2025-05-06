@@ -184,7 +184,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
         <View
           style={{
             flex: 1,
-            paddingTop: Platform.OS === 'android' ? insets.top : 0,
+            paddingTop: insets.top,
             backgroundColor: '#900000',
           }}>
           {/* Header */}

@@ -296,7 +296,7 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
         <View
           style={{
             flex: 1,
-            paddingTop: Platform.OS === 'android' ? insets.top : 0,
+            paddingTop: insets.top,
             backgroundColor: '#900000',
           }}>
           <AppHeader
