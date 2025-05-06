@@ -1,4 +1,3 @@
-// src/components/AppHeader.tsx
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from 'App';
@@ -43,7 +42,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
   return (
     <>
-      // Main container with background color, merged with optional style
       <View style={[{ backgroundColor: COLORS.primary }, style]}>
         <BlurView intensity={10} tint="dark" className="overflow-hidden">
           {/* Use relative parent for absolute positioning inside */}
