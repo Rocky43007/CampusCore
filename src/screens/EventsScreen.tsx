@@ -297,7 +297,7 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
           style={{
             flex: 1,
             paddingTop: insets.top,
-            backgroundColor: '#900000',
+            backgroundColor: Platform.OS === 'ios' ? COLORS.primary : '#900000',
           }}>
           <AppHeader
             title="Campus"

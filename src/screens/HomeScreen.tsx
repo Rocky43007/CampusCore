@@ -185,7 +185,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
           style={{
             flex: 1,
             paddingTop: insets.top,
-            backgroundColor: '#900000',
+            backgroundColor: Platform.OS === 'ios' ? COLORS.primary : '#900000',
           }}>
           {/* Header */}
           <AppHeader title="Campus" accentTitle="Core" />
