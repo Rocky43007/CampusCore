@@ -1,13 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'App';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, JSX } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
   Image,
   ActivityIndicator,
   RefreshControl,
@@ -17,6 +15,7 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
+  StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -289,38 +288,27 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
     [isLoadingMore, loading]
   );
 
-  // --- Notification Handler ---
-  const handleNotificationPress = (): void => {
-    console.log('Notifications');
-  };
-
   // --- Main Render ---
   return (
     <>
-      {Platform.OS === 'ios' && (
-        <SafeAreaView style={{ flex: 0, backgroundColor: COLORS.primary }} />
-      )}
-      <SafeAreaView className="flex-1 bg-slate-50">
-        {/* Status Bar */}
-        <StatusBar barStyle="light-content" backgroundColor="#900000" animated />
-
+      <StatusBar barStyle="light-content" />
+      <View className="flex-1 bg-slate-50">
         <View
           style={{
             flex: 1,
             paddingTop: Platform.OS === 'android' ? insets.top : 0,
-            backgroundColor: 'white',
+            backgroundColor: '#900000',
           }}>
           <AppHeader
             title="Campus"
             accentTitle="Events"
-            onNotificationPress={handleNotificationPress}
             showBackButton
             navigation={navigation}
             style={{ backgroundColor: COLORS.primary }}
           />
 
           {/* Search Bar Container */}
-          <View style={styles.searchOuterContainer}>
+          <View style={styles.searchOuterContainer} className="bg-slate-50">
             <View style={styles.searchInnerContainer}>
               <Ionicons
                 name="search-outline"
@@ -349,13 +337,14 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
 
           {/* Main Content Area */}
           {loading ? (
-            <View style={styles.loadingContainer}>
+            <View style={styles.loadingContainer} className="bg-slate-50">
               <ActivityIndicator size="large" color={COLORS.primary} />
               <Text style={styles.loadingText}>Loading Events...</Text>
             </View>
           ) : error ? (
             <ScrollView // Use ScrollView for error state to allow refresh
               contentContainerStyle={styles.errorContainer}
+              className="bg-slate-50"
               refreshControl={
                 <RefreshControl
                   refreshing={refreshing}
@@ -378,6 +367,7 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
             </ScrollView>
           ) : (
             <FlatList
+              className="bg-slate-50"
               data={filteredEvents}
               renderItem={renderItem}
               keyExtractor={keyExtractor}
@@ -405,7 +395,7 @@ export default function EventsScreen({ navigation }: EventsScreenProps): JSX.Ele
         {/* {!loading && (
           <DevEventCounter filteredCount={filteredEvents.length} totalCount={fullEvents.length} />
         )} */}
-      </SafeAreaView>
+      </View>
     </>
   );
 }

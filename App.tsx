@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { JSX } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import EventsScreen from '~/screens/EventsScreen';

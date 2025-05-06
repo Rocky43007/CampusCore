@@ -1,17 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'App';
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import {
   View,
   Text,
-  SafeAreaView,
-  StatusBar,
   Image,
   Platform,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -43,38 +42,27 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps): JSX.E
       'https://scontent-lga3-1.cdninstagram.com/v/t51.2885-19/356417586_2333872566800363_937917511512713269_n.jpg?_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=111&_nc_oc=Q6cZ2QG8DRmSvdVsYQi-wmaCGSm6JfVNJY7uLWRlb48jeFhjrDPt1stzGQm0EMaGSrNLb9k&_nc_ohc=gdxDJrh-QRMQ7kNvwFejcyf&_nc_gid=IppRmgXb1GhGCsX618vIoA&edm=ALGbJPMBAAAA&ccb=7-5&oh=00_AfFzoBpwwIb3mtbJNbM5vMeJMI9sJyztJ0QckPAhSBGq4g&oe=68185401&_nc_sid=7d3ac5',
   };
 
-  // --- Handlers ---
-  const handleNotificationPress = (): void => {
-    console.log('Notification icon pressed on Profile Screen');
-  };
-
   return (
     <>
-      {Platform.OS === 'ios' && (
-        <SafeAreaView style={{ flex: 0, backgroundColor: COLORS.primary }} />
-      )}
-      <SafeAreaView className="flex-1 bg-slate-50">
-        {/* Status Bar */}
-        <StatusBar barStyle="light-content" backgroundColor="#900000" animated />
-
+      <StatusBar barStyle="light-content" />
+      <View className="flex-1">
         <View
           style={{
             flex: 1,
             paddingTop: Platform.OS === 'android' ? insets.top : 0,
-            backgroundColor: 'white',
+            backgroundColor: '#900000',
           }}>
           {/* Header */}
           <AppHeader
             title="Campus"
             accentTitle="Profile"
-            onNotificationPress={handleNotificationPress}
             showBackButton
             navigation={navigation}
             style={{ backgroundColor: COLORS.primary }}
           />
           {/* Main Content */}
           {/* Use ScrollView to allow for scrolling on smaller screens */}
-          <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          <ScrollView contentContainerStyle={styles.scrollViewContent} className="bg-slate-50">
             {/* --- ID Card Visual Container --- */}
             <View
               style={styles.idCardContainer}
@@ -168,7 +156,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps): JSX.E
           </DefaultModal>
         </View>
         <AppFooter />
-      </SafeAreaView>
+      </View>
     </>
   );
 }

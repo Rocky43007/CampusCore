@@ -2,9 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'App';
 import { BlurView } from 'expo-blur';
-import * as NavigationBar from 'expo-navigation-bar';
-import { JSX, useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, StatusBar, ScrollView, Linking, Platform } from 'react-native';
+import { JSX, useState } from 'react';
+import { View, Text, ScrollView, Linking, Platform, StatusBar } from 'react-native';
 import '../../global.css';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -39,18 +38,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
   const [isPdfPreview, setIsPdfPreview] = useState<boolean>(false);
   const [isTransportModalVisible, setIsTransportModalVisible] = useState<boolean>(false);
   const [isDiningModalVisible, setIsDiningModalVisible] = useState<boolean>(false);
-  const [isNotificationsModalVisible, setIsNotificationsModalVisible] = useState<boolean>(false);
   const [isAlertVisible, setIsAlertVisible] = useState<boolean>(false);
-
-  useEffect(() => {
-    (async () => {
-      if (Platform.OS !== 'android') return;
-      // enables edge-to-edge mode
-      await NavigationBar.setPositionAsync('absolute');
-      // transparent backgrounds to see through
-      await NavigationBar.setBackgroundColorAsync('#ffffff00');
-    })();
-  }, []);
 
   const serviceTiles: IServiceTile[] = [
     {
@@ -180,42 +168,30 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
     Linking.openURL('tel:6316323333');
   };
 
-  const handleNotificationPress = (): void => {
-    setIsNotificationsModalVisible(true);
-  };
-
   return (
     <>
-      {Platform.OS === 'ios' && (
-        <SafeAreaView style={{ flex: 0, backgroundColor: COLORS.primary }} />
-      )}
-      <SafeAreaView className="flex-1 bg-slate-50">
-        {/* Status Bar */}
-        <StatusBar barStyle="light-content" backgroundColor="#900000" animated />
+      <StatusBar barStyle="light-content" />
+      <View className="flex-1">
         {/* <StatusBar
           barStyle="light-content"
           backgroundColor="#01543f"
           translucent
           animated
           // hidden={false}
-        /> */}
+        />
 
         {/* Main Content with adjusted padding for status bar */}
         <View
           style={{
             flex: 1,
             paddingTop: Platform.OS === 'android' ? insets.top : 0,
-            backgroundColor: 'white',
+            backgroundColor: '#900000',
           }}>
           {/* Header */}
-          <AppHeader
-            title="Campus"
-            accentTitle="Core"
-            onNotificationPress={handleNotificationPress}
-          />
+          <AppHeader title="Campus" accentTitle="Core" />
 
           {/* Main Content */}
-          <ScrollView className="flex-1 px-4 pt-4">
+          <ScrollView className="flex-1 bg-slate-50 px-4 pt-4">
             {/* Emergency Card */}
             <EmergencyCard onPress={handleEmergencyPress} />
 
@@ -348,46 +324,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
           />
 
           <DefaultModal
-            isVisible={isNotificationsModalVisible}
-            onClose={() => setIsNotificationsModalVisible(false)}
-            title="Notifications">
-            <View
-              style={{
-                padding: 20,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <View
-                style={{
-                  backgroundColor: COLORS.light,
-                  borderRadius: 50,
-                  padding: 16,
-                  marginBottom: 12,
-                }}>
-                <Ionicons name="notifications-off-outline" size={32} color={COLORS.tertiary} />
-              </View>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: COLORS.dark,
-                  marginBottom: 4,
-                }}>
-                No notifications found
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: COLORS.tertiary,
-                  textAlign: 'center',
-                  marginBottom: 8,
-                }}>
-                We'll notify you when there's something new
-              </Text>
-            </View>
-          </DefaultModal>
-
-          <DefaultModal
             isVisible={isAlertVisible}
             onClose={() => setIsAlertVisible(false)}
             title="Feature Unavailable">
@@ -427,7 +363,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps): JSX.Element
             </View>
           </DefaultModal>
         </View>
-      </SafeAreaView>
+      </View>
     </>
   );
 }
