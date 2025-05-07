@@ -1,11 +1,11 @@
-import * as Application from 'expo-application'; // Import expo-application
+// import * as Application from 'expo-application';
 import React from 'react';
 import { View, Text } from 'react-native';
 
 import '../../global.css';
 
 const AppFooter: React.FC = () => {
-  const appVersion = Application.nativeApplicationVersion ?? '0.0.0'; // TO BE USED WHEN APPLICATION IS NATIVE BUILT AND NOT EXPO GO
+  // const appVersion = Application.nativeApplicationVersion ?? '0.0.0'; // TO BE USED WHEN APPLICATION IS NATIVE BUILT AND NOT EXPO GO
   const currentYear = new Date().getFullYear();
 
   return (
